@@ -1,10 +1,12 @@
 package server
 
 import (
+	"CloudStorageProject-FileServer/pkg/Constants"
 	"CloudStorageProject-FileServer/pkg/config"
 	"CloudStorageProject-FileServer/pkg/logger/logger"
 	"fmt"
 	"net/http"
+	"runtime"
 	"time"
 )
 
@@ -28,11 +30,20 @@ func Logger(logs *logger.Log, next http.Handler) http.Handler {
 
 func NewServer(config *config.Config, logs *logger.Log) *Server {
 	port := config.Port
-	FilesDirectory = config.FilesDir
+	//FilesDirectory = config.FilesDir
+	if runtime.GOOS == "windows" {
+		FilesDirectory = Constants.FilesPathWindows
+	} else if runtime.GOOS == "linux" {
+		FilesDirectory = Constants.FilesPathLinux
+	} else {
+		FilesDirectory = Constants.FilesPathLinux
+	}
+
 	//TODO: сделать проверку на наличие директории
 	router := http.NewServeMux()
-	router.HandleFunc("/client/get-files", getFilesFunc)
-
+	router.HandleFunc("/client/api/v1/get-files", getFilesFunc)
+	router.HandleFunc("/client/api/v1/upload-files", storeFilesFunc)
+	router.HandleFunc("/client/api/v1/get-files-list", getFilesListFunc)
 	handler := Logger(logs, router)
 	return &Server{
 		Port:   port,

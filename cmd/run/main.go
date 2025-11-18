@@ -9,7 +9,6 @@ import (
 
 func main() {
 	logs := logger.NewLog()
-
 	conf, err := config.ReadConfig()
 	if err != nil {
 		logs.Error(fmt.Sprintf("Reading config file error: %v", err), logger.GetPlace())

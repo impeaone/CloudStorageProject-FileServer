@@ -6,4 +6,6 @@ const (
 	ConfigPathWindows = "../../pkg/config/config.yaml"
 	LoggerPathLinux   = "./Log.txt"
 	LoggerPathWindows = "../../Log.txt"
+	FilesPathLinux    = "./storage"
+	FilesPathWindows  = "../../storage"
 )
