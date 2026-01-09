@@ -12,9 +12,19 @@ import (
 	"time"
 )
 
-type Log struct{}
+type Log struct {
+	Level string // Level - уровень логгирования. NONE: нету логов, INFO, WARNING, ERROR
+}
 
-func NewLog() *Log { return &Log{} }
+func NewLog(level string) *Log {
+	choseLevel := level
+	if level != "INFO" && level != "WARNING" && level != "ERROR" {
+		choseLevel = "INFO"
+	}
+	return &Log{
+		Level: choseLevel,
+	}
+}
 
 func (logs *Log) Info(message string, place string) {
 	log.Println("\nLevel: Info" + "\nMessage: " + message + "\nPlace: " + place + "\n")

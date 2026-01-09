@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal | Вход</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="image-section">
+    <div class="image-overlay"></div>
+    <img src="/static/img/main.jpg" alt="Облачное хранилище" class="hero-image">
+  </div>
+
+  <div class="login-section">
+    <div class="login-div">
+      <div class="logo">CloudStorage</div>
+
+      <form class="login-form" id="form">
+        <div class="form-group">
+          <label for="apikey">API-ключ</label>
+          <input type="password" id="apikey" name="apikey" placeholder="Введите ваш ключ доступа" required>
+        </div>
+
+        <button type="submit" class="login-button">Войти</button>
+      </form>
+
+      <div class="mobile-info">
+        <p>Ваш ключ будет сохранен в cookies для последующего использования</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  localStorage.setItem("baseURL", window.location.origin);
+  document.getElementById('form').addEventListener('submit', function(event){
+    event.preventDefault();
+    const api = document.getElementById('apikey').value;
+    if (api.trim() === '') {
+      alert('Пожалуйста, введите API-ключ');
+      return;
+    }
+    document.cookie = "apikey=" + api + "; path=/; max-age=86400"; // сохраняем на 1 день
+    location.reload();
+  });
+
+  // Проверяем cookies при загрузке
+  window.onload = function() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      if (cookie.trim().startsWith('apikey=')) {
+        const apiKey = cookie.split('=')[1];
+        document.getElementById('apikey').value = apiKey;
+        break;
+      }
+    }
+  };
+</script>
+</body>
+</html>

@@ -2,7 +2,10 @@ package app
 
 import (
 	"CloudStorageProject-FileServer/internal/app/server"
+	minioClient "CloudStorageProject-FileServer/internal/minio"
 	"CloudStorageProject-FileServer/pkg/config"
+	"CloudStorageProject-FileServer/pkg/database/postgres"
+	"CloudStorageProject-FileServer/pkg/database/redis"
 	"CloudStorageProject-FileServer/pkg/logger/logger"
 	"fmt"
 	"net/http"
@@ -12,8 +15,9 @@ type App struct {
 	fileServer *server.Server
 }
 
-func NewApp(config *config.Config, logger *logger.Log) *App {
-	fileServer := server.NewServer(config, logger)
+func NewApp(config *config.Config, logger *logger.Log, pgs *postgres.Postgres, rds *redis.Redis,
+	minio *minioClient.MinioClient) *App {
+	fileServer := server.NewServer(config, logger, pgs, rds, minio)
 	return &App{
 		fileServer: fileServer,
 	}

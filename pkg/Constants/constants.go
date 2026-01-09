@@ -2,10 +2,10 @@ package Constants
 
 // TODO: Константы сделать
 const (
-	ConfigPathLinux   = "./pkg/config/config.yaml"
-	ConfigPathWindows = "../../pkg/config/config.yaml"
-	LoggerPathLinux   = "./Log.txt"
-	LoggerPathWindows = "../../Log.txt"
-	FilesPathLinux    = "./storage"
-	FilesPathWindows  = "../../storage"
+	LoggerPathLinux     = "./Log.txt"
+	LoggerPathWindows   = "../../Log.txt"
+	TemplatePathLinux   = "./pkg/templates/"
+	TemplatePathWindows = "../../pkg/templates/"
+	StaticPathLinux     = "./pkg/static/"
+	StaticPathWindows   = "../../pkg/static/"
 )

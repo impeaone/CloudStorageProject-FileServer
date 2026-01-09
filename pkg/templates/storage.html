@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.cloudflare.com/packages/cloudflare-fonts/1.0.0/cloudflare-fonts.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/css/storage.css">
+</head>
+<body>
+    <div class="header">
+        <h1>StorageCloud</h1>
+        <div class="nav-bar">
+            <a>Главная</a>
+            <a>Хранилище</a>
+            <a onclick="exit_to_main()">Выйти</a>
+        </div>
+    </div>
+    <main>
+        <label class="upload-files">
+            Выбрать файлы
+            <input type="file" id="file-upload" style="display: none;" name="file" multiple onchange="showFiles(this.files)">
+        </label>
+        <div class="search-box">
+            <h1>Файловое хранилище</h1>
+            <label>
+                <input type="text" class="file-field" id="file-field" onchange="search_files(this.value)">
+            </label>
+        </div>
+
+        <div class="files-container" id="files-container">
+        </div>
+
+        <div id="fileWindow" style="display:none; position:fixed; bottom:20px; right:20px; background:white; border:1px solid black; padding:10px; width:300px;">
+            <h4>Файлы:</h4>
+            <div id="fileList"></div>
+
+            <div id="progressContainer" style="margin:10px 0; display:none;">
+                <div style="width:100%; height:20px; background:#f0f0f0; border-radius:10px; overflow:hidden;">
+                    <div id="progressBar" style="width:0%; height:100%; background:#4CAF50; transition:width 0.3s"></div>
+                </div>
+                <div id="progressText" style="text-align:center; font-size:14px; margin-top:5px;">0%</div>
+            </div>
+
+            <button class="upload-files-button" id="uploadFiles" onclick="uploadFiles()">Загрузить</button>
+            <button class="upload-files-button" id="deleteFiles" onclick="clearWindow()">Очистить</button>
+        </div>
+    </main>
+    <script>
+        let filesUpload = new Set();
+
+        function showFiles(fileList) {
+            const newFiles = Array.from(fileList);
+            newFiles.forEach(file => {
+                filesUpload.add(file);
+            });
+
+            let html = '';
+            filesUpload.forEach(file => {
+                const size = (file.size / 1024).toFixed(1); // KB
+                html += `<div class="upload-item">${file.name} (${size} KB)</div>`;
+            });
+            document.getElementById('fileList').innerHTML = html;
+            document.getElementById('fileWindow').style.display = 'block';
+        }
+
+        function clearWindow() {
+            const filesInput = document.getElementById("file-upload");
+            filesInput.value = '';
+            document.getElementById('fileWindow').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'none';
+            filesUpload.clear();
+        }
+
+        async function uploadFiles() {
+            const uploadButton = document.getElementById('uploadFiles');
+            const deleteButton = document.getElementById('deleteFiles');
+            uploadButton.disabled = true;
+            deleteButton.disabled = true;
+
+            if (filesUpload.size === 0) {
+                alert("Выбирите файлы!");
+                return;
+            }
+
+            // Показываем прогресс
+            document.getElementById('progressContainer').style.display = 'block';
+            updateProgress(0, "Начинаем загрузку...");
+
+            const formData = new FormData();
+            filesUpload.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                // Используем XMLHttpRequest вместо fetch для отслеживания прогресса
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const percent = Math.round((event.loaded / event.total) * 100);
+                        updateProgress(percent, `Загружено: ${percent}%`);
+                    }
+                });
+
+                // Обработка завершения
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        console.log(result);
+                        const files = result['new_files'];
+
+                        const filesSection = document.querySelector(".files-container");
+                        if (filesSection) {
+                            filesSection.innerHTML = '';
+                            loadFiles(files);
+                        }
+
+                        updateProgress(100, "Загрузка завершена!");
+
+                        // Через 2 секунды закрываем окно
+                        setTimeout(() => {
+                            clearWindow();
+                            uploadButton.disabled = false;
+                            deleteButton.disabled = false;
+                            alert("Успешная загрузка файлов");
+                        }, 2000);
+
+                    } else {
+                        updateProgress(0, "Ошибка: " + xhr.status);
+                        alert('Ошибка сервера: ' + xhr.status);
+                    }
+                };
+
+                xhr.onerror = function() {
+                    updateProgress(0, "Ошибка сети");
+                    alert('Ошибка сети');
+                };
+
+                // Отправляем запрос
+                xhr.open('POST', `/client/api/v1/upload-files?api=${api}`);
+                xhr.send(formData);
+
+            } catch (error) {
+                updateProgress(0, "Ошибка");
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        // Функция обновления прогресса
+        function updateProgress(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            if (progressBar) {
+                progressBar.style.width = percent + '%';
+
+                // Меняем цвет в зависимости от прогресса
+                if (percent < 30) {
+                    progressBar.style.background = '#ff4444';
+                } else if (percent < 70) {
+                    progressBar.style.background = '#ffa726';
+                } else {
+                    progressBar.style.background = '#4CAF50';
+                }
+            }
+
+            if (progressText) {
+                progressText.textContent = text || percent + '%';
+            }
+        }
+    </script>
+
+<script>
+    const icons = {
+        'doc': 'fa-file-word',
+        'docx': 'fa-file-word',
+        'odt': 'fa-file-word',
+        'rtf': 'fa-file-word',
+
+        'pdf': 'fa-file-pdf',
+
+        'xls': 'fa-file-excel',
+        'xlsx': 'fa-file-excel',
+        'ods': 'fa-file-excel',
+        'csv': 'fa-file-csv',
+
+        'ppt': 'fa-file-powerpoint',
+        'pptx': 'fa-file-powerpoint',
+        'odp': 'fa-file-powerpoint',
+
+        'jpg': 'fa-file-image',
+        'jpeg': 'fa-file-image',
+        'png': 'fa-file-image',
+        'gif': 'fa-file-image',
+        'bmp': 'fa-file-image',
+        'svg': 'fa-file-image',
+        'webp': 'fa-file-image',
+        'tiff': 'fa-file-image',
+        'ico': 'fa-file-image',
+
+        'zip': 'fa-file-archive',
+        'rar': 'fa-file-archive',
+        '7z': 'fa-file-archive',
+        'tar': 'fa-file-archive',
+        'gz': 'fa-file-archive',
+        'bz2': 'fa-file-archive',
+
+        'txt': 'fa-file-alt',
+        'log': 'fa-file-alt',
+        'md': 'fa-file-alt',
+        'ini': 'fa-file-alt',
+        'cfg': 'fa-file-alt',
+        'conf': 'fa-file-alt',
+
+        'py': 'fa-file-code',
+        'js': 'fa-file-code',
+        'html': 'fa-file-code',
+        'css': 'fa-file-code',
+        'php': 'fa-file-code',
+        'java': 'fa-file-code',
+        'cpp': 'fa-file-code',
+        'h': 'fa-file-code',
+        'json': 'fa-file-code',
+        'xml': 'fa-file-code',
+        'c': 'fa-file-code',
+        'go': 'fa-file-code',
+
+        'mp4': 'fa-file-video',
+        'avi': 'fa-file-video',
+        'mov': 'fa-file-video',
+        'mkv': 'fa-file-video',
+        'wmv': 'fa-file-video',
+        'flv': 'fa-file-video',
+
+        'mp3': 'fa-file-audio',
+        'wav': 'fa-file-audio',
+        'ogg': 'fa-file-audio',
+        'flac': 'fa-file-audio',
+        'aac': 'fa-file-audio',
+
+        'exe': 'fa-cogs',
+        'msi': 'fa-cogs',
+        'bat': 'fa-terminal',
+        'sh': 'fa-terminal',
+
+        'dll': 'fa-cube',
+        'iso': 'fa-compact-disc',
+        'db': 'fa-database',
+        'sql': 'fa-database',
+    }
+    function getIconByFileType(file_type) {
+        if (file_type in icons) {
+            return icons[`${file_type}`]
+        }
+        return 'fa-file'
+    }
+</script>
+<script>
+    console.log(window.location);
+    const baseURL = localStorage.getItem("baseURL");
+    console.log(baseURL);
+    function exit_to_main() {
+        document.cookie = "apikey=; max-age=0; path=/";
+        window.location.replace(`${baseURL}/index`);
+
+    }
+</script>
+<script>
+    function loadFiles(files) {
+       if(!files) {return [];}
+       const filesSection = document.querySelector(".files-container");
+       files.forEach(file => {
+            const fileElement = createFileElement(file);
+            filesSection.appendChild(fileElement);
+       });
+    }
+    function createFileElement(file) {
+       const fileElem = document.createElement('div');
+       fileElem.className = 'file';
+       const fileHeader = document.createElement('div');
+       fileHeader.className = 'file-header';
+       const fileDetails = document.createElement('div');
+       fileDetails.className = 'file-details';
+
+       const file_name = `${file["file_name"]}`;
+       const file_type = `${file["file_type"]}`;
+       const file_icon = getIconByFileType(file_type);
+       fileHeader.innerHTML = `
+            <div class="file-icon"><i class="fas ${file_icon}"></i></div>
+            <div class="file-name">${file_name}</div>
+            <div class="file-type">${file_type}</div>
+       `;
+       fileDetails.innerHTML = `
+            <div class="detail-row">
+                <p class="detail-label">Дата загрузки:</p>
+                <p class="detail-value">${file["create_date"]}</p>
+            </div>
+            <div class="detail-row">
+                <p class="detail-label">Размер:</p>
+                <p class="detail-value">${file["file_size"]}</p>
+            </div>
+       `;
+       const fileMoves = document.createElement('div');
+       fileMoves.className = "file-moves";
+       fileMoves.innerHTML = `
+            <button onclick="downloadFile('${file_name}')">Скачать</button>
+            <button onclick="deleteFile('${file_name}')">Удалить</button>
+       `;
+
+       fileElem.appendChild(fileHeader);
+       fileElem.appendChild(fileDetails);
+       fileElem.appendChild(fileMoves);
+       return fileElem;
+    }
+
+    async function deleteFile(filename) {
+        if (!confirm(`Вы уверены, что хотите удалить файл "${filename}"?`)) {
+            return;
+        }
+        if (!api){
+            exit_to_main();
+            return
+        }
+        try {
+            const url = baseURL + `/client/api/v1/delete-file?api=${api}&filename=${filename}`
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            if (response.status === 200) {
+                const files = result['new_files'];
+                const filesSection = document.querySelector(".files-container");
+                filesSection.innerHTML = '';
+                loadFiles(files);
+            } else {
+                alert('Ошибка сервера: ' + response.status);
+            }
+        } catch (error) {
+            console.error('Ошибка удаления:', error);
+            alert('Не удалось удалить файл');
+        }
+
+    }
+    function downloadFile(filename) {
+        if (!api){
+            exit_to_main();
+            return
+        }
+        try {
+            console.log(baseURL);
+            console.log(filename);
+            const url = baseURL + `/client/api/v1/get-file?api=${api}&filename=${filename}`
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Ошибка при скачивании:', error);
+            alert('Не удалось скачать файл');
+        }
+    }
+</script>
+<script>
+    const api = document.cookie.split("apikey=")[1];
+    function request(api) {
+        if (!api){
+            exit_to_main();
+            return
+        }
+        return fetch(baseURL + `/client/api/v1/get-files-list?api=${api}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Ошибка загрузки данных');
+            }
+            return res.json();
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(error => {
+            console.error("Ошибка: ", error);
+            return [];
+        });
+    }
+    let api_files = [];
+    async function getFiles(api){
+        const files = await request(api);
+        if (!files) {return [];}
+        api_files = files.sort();
+
+        loadFiles(api_files);
+    }
+    getFiles(api);
+</script>
+    <script>
+        function search_files(file_search){
+            const container = document.querySelector(".files-container");
+            if (file_search === "" || file_search === " ") {
+                container.innerHTML = "";
+                loadFiles(api_files);
+                return
+            }
+
+            let sorted_files = [];
+            api_files.forEach(file => {
+                const file_search_lower = file_search.toLowerCase();
+                const file_name = file['file_name'].toLowerCase();
+                if (file_name.includes(file_search_lower)) {
+                    sorted_files.push(file);
+                }
+            });
+            console.log(sorted_files);
+            container.innerHTML = "";
+            loadFiles(sorted_files);
+        }
+    </script>
+</body>
+</html>

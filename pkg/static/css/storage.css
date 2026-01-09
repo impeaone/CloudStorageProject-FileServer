@@ -1,0 +1,432 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans|Playfair+Display:400,700,400italic,700italic&subset=latin,cyrillic);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Playfair Display', serif;
+    min-height: 100vh;
+    width: 100%;
+    font-size: 1rem;
+    background-color: #ffffff;
+    color: #333;
+}
+h1 {
+    color: #222;
+    font-weight: 700;
+}
+
+/* Header */
+.header {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+    background-color: #f8f8f8;
+    border-bottom: 2px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+@media (min-width: 768px) {
+    .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+    }
+}
+@media (min-width: 1024px) {
+    .header {
+        padding: 25px 40px;
+    }
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #111;
+}
+@media (min-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+        margin-bottom: 0;
+    }
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+@media (min-width: 768px) {
+    .nav-bar {
+        gap: 15px;
+    }
+}
+.nav-bar a {
+    border: 1px solid #555;
+    padding: 8px 15px;
+    border-radius: 20px;
+    color: #444;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+    background: white;
+    font-weight: 500;
+}
+@media (min-width: 768px) {
+    .nav-bar a {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}
+.nav-bar a:hover {
+    background: #f0f0f0;
+    border-color: #222;
+    color: #111;
+}
+.nav-bar a:active {
+    background: #e0e0e0;
+}
+
+/* Main Content */
+main {
+    padding: 15px;
+    position: relative;
+    min-height: calc(100vh - 120px);
+}
+@media (min-width: 768px) {
+    main {
+        padding: 25px;
+    }
+}
+
+/* Upload Button */
+.upload-files {
+    position: relative;
+    display: inline-block;
+    margin: 10px 0 20px;
+    padding: 12px 25px;
+    background: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #444;
+    transition: all 0.3s;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+@media (min-width: 768px) {
+    .upload-files {
+        width: auto;
+        position: absolute;
+        top: 20px;
+        left: 25px;
+        margin: 0;
+    }
+}
+.upload-files:hover {
+    background: #f5f5f5;
+    border-color: #222;
+    color: #111;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+
+/* Search Box */
+.search-box {
+    text-align: center;
+    margin: 20px 0 30px;
+}
+.search-box h1 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #222;
+}
+@media (min-width: 768px) {
+    .search-box h1 {
+        font-size: 2rem;
+    }
+}
+.search-box input {
+    margin-top: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 14px 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    background: #fff;
+    color: #333;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.search-box input:focus {
+    outline: none;
+    border-color: #777;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+@media (min-width: 768px) {
+    .search-box input {
+        width: 60%;
+        padding: 16px 25px;
+    }
+}
+@media (min-width: 1024px) {
+    .search-box input {
+        width: 40%;
+    }
+}
+
+/* Files Container */
+.files-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 0;
+}
+@media (min-width: 768px) {
+    .files-container {
+        padding: 0 5%;
+    }
+}
+@media (min-width: 1200px) {
+    .files-container {
+        padding: 0 10%;
+    }
+}
+@media (max-width: 480px) {
+    .files-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* File Card */
+.file {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    transition: all 0.3s;
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #eee;
+    position: relative;
+    overflow: hidden;
+}
+@media (min-width: 768px) {
+    .file {
+        padding: 22px;
+    }
+}
+.file:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    border-color: #ddd;
+}
+
+/* File Header - ВСЕ ЭЛЕМЕНТЫ В ОДНУ СТРОКУ */
+.file-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    min-height: 50px;
+    gap: 12px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.file-icon {
+    font-size: 2.2rem;
+    color: #555;
+    flex-shrink: 0;
+    min-width: 40px;
+}
+@media (min-width: 768px) {
+    .file-icon {
+        font-size: 2.5rem;
+    }
+}
+
+.file-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+@media (min-width: 768px) {
+    .file-name {
+        font-size: 1.2rem;
+    }
+}
+
+.file-type {
+    border: 1px solid #888;
+    background-color: #f8f8f8;
+    color: #666;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+@media (min-width: 768px) {
+    .file-type {
+        font-size: 0.85rem;
+        padding: 5px 12px;
+    }
+}
+
+.file-details {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-bottom: 20px;
+}
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    justify-content: space-between;
+    align-items: center;
+}
+.detail-label {
+    font-weight: 600;
+    color: #777;
+    min-width: 130px;
+    font-size: 0.9rem;
+}
+.detail-value {
+    color: #444;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* File Actions */
+.file-moves {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.file-moves button {
+    background: #fff;
+    color: #444;
+    padding: 10px 20px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    flex: 1;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+.file-moves button:hover {
+    background: #f5f5f5;
+    border-color: #888;
+    color: #222;
+}
+.file-moves button:first-child:hover {
+    background: #f0f0f0;
+    border-color: #666;
+}
+.file-moves button:last-child:hover {
+    background: #f5f5f5;
+    border-color: #999;
+    color: #d33;
+}
+@media (max-width: 480px) {
+    .file-moves {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Upload Window */
+#fileWindow {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    max-width: 90%;
+    width: 380px;
+    z-index: 1000;
+}
+@media (max-width: 480px) {
+    #fileWindow {
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        width: 90%;
+        max-width: 350px;
+    }
+}
+
+#fileWindow h4 {
+    color: #222;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+#fileList {
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.upload-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    word-break: break-all;
+    color: #555;
+}
+.upload-item:last-child {
+    border-bottom: none;
+}
+
+.upload-files-button {
+    background: #fff;
+    color: #444;
+    padding: 10px 20px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    font-weight: 500;
+    margin-right: 10px;
+}
+.upload-files-button:hover {
+    background: #f5f5f5;
+    border-color: #888;
+    color: #222;
+}
+.upload-files-button:first-child:hover {
+    background: #f0f0f0;
+    border-color: #666;
+}
