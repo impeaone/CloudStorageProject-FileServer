@@ -48,21 +48,24 @@ func validate(next http.Handler, pgs *postgres.Postgres, rds *redis.Redis,
 				return
 			}
 
-			// TODO: потом тут redis еще
-
-			if exists := pgs.CheckApiExists(api); !exists {
-				logger.Warning(fmt.Sprintf("Client: %s; EndPoint: %s; Method: %s; Time: %v; Message: bad api",
-					r.RemoteAddr, r.URL, r.Method, time.Now().Format("02.01.2006 15:04:05")), logger2.GetPlace())
-				http.SetCookie(w, &http.Cookie{
-					Name:    "apikey",
-					Value:   "",
-					Path:    "/",
-					MaxAge:  -1,
-					Expires: time.Unix(0, 0),
-				})
-				http.Redirect(w, r, "/", http.StatusFound)
-				return
+			if redisExists := rds.ExistsAPIField(api); !redisExists {
+				existsPGS := pgs.CheckApiExists(api)
+				if existsPGS == nil {
+					logger.Warning(fmt.Sprintf("Client: %s; EndPoint: %s; Method: %s; Time: %v; Message: bad api",
+						r.RemoteAddr, r.URL, r.Method, time.Now().Format("02.01.2006 15:04:05")), logger2.GetPlace())
+					http.SetCookie(w, &http.Cookie{
+						Name:    "apikey",
+						Value:   "",
+						Path:    "/",
+						MaxAge:  -1,
+						Expires: time.Unix(0, 0),
+					})
+					http.Redirect(w, r, "/", http.StatusFound)
+					return
+				}
+				go rds.SetAPIField(existsPGS)
 			}
+
 		}
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		r = r.WithContext(context.WithValue(r.Context(), "api", api))

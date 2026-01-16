@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"CloudStorageProject-FileServer/pkg/models"
 	"CloudStorageProject-FileServer/pkg/tools"
 	"context"
 	"fmt"
@@ -63,16 +64,16 @@ func createExampleAPI(pool *pgxpool.Pool) {
 	_ = pool.QueryRow(ctx, query)
 }
 
-func (p *Postgres) CheckApiExists(api string) bool {
+func (p *Postgres) CheckApiExists(api string) *models.APIPGS {
 	ctx := context.Background()
-	var apiID string
-	query := fmt.Sprintf("SELECT id FROM minio_keys WHERE key_name = '%s'", api)
-	if p.pool.QueryRow(ctx, query).Scan(&apiID); apiID == "" {
-		return false
+	apiStruct := &models.APIPGS{}
+	query := fmt.Sprintf("SELECT * FROM minio_keys WHERE key_name = '%s'", api)
+	if p.pool.QueryRow(ctx, query).Scan(&apiStruct.Id, &apiStruct.KeyName, &apiStruct.CloudAccess, &apiStruct.Email,
+		&apiStruct.CreatedAt, &apiStruct.LastLogin); apiStruct.KeyName == "" {
+		return nil
 	}
-	return true
+	return apiStruct
 }
-
 func (p *Postgres) UpdateLastLogin(api string) {
 
 }

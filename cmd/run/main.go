@@ -9,10 +9,14 @@ import (
 	"CloudStorageProject-FileServer/pkg/logger/logger"
 	"CloudStorageProject-FileServer/pkg/tools"
 	"fmt"
+	"runtime"
 )
 
 /*
 Требуемые переменные окружения:
+
+	Runtime:
+	tools.GetEnvAsInt("NUM_CPU", runtime.NumCPU())
 
 	MINIO:
 	tools.GetEnv("SERVER_PORT", "11682")
@@ -36,8 +40,15 @@ import (
 
 	logger:
 	tools.GetEnv("CloudStorage_LOGGER", "INFO")
+
+	REDIS:
+	tools.GetEnv("REDIS_HOST", "localhost")
+	tools.GetEnvAsInt("REDIS_PORT", 6379)
+	tools.GetEnv("REDIS_PASSWORD", "")
+	rdsDB := tools.GetEnvAsInt("REDIS_DB", 0)
 */
 func main() {
+	runtime.GOMAXPROCS(tools.GetEnvAsInt("NUM_CPU", runtime.NumCPU()))
 	// Logger
 	logs := logger.NewLog(tools.GetEnv("CloudStorage_LOGGER", "INFO"))
 
@@ -56,8 +67,12 @@ func main() {
 	}
 	logs.Info("Успешная инициализация PostgreSQL", logger.GetPlace())
 
-	rds := &redis.Redis{}
-
+	rds, errRds := redis.NewRedis()
+	if errRds != nil {
+		logs.Error(fmt.Sprintf("Ошибка инициализации Redis: %v", errRds), logger.GetPlace())
+		return
+	}
+	logs.Info("Успешная инициализация Redis", logger.GetPlace())
 	// Инициализация конфига
 	conf, err := config.ReadConfig()
 	if err != nil {
