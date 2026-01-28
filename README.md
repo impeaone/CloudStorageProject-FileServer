@@ -77,7 +77,7 @@ METRICS_SERVER_IP=0.0.0.0
 
 | Главная страница | Хранилище |
 |------------------|-----------|
-| <img src="images/index.png" width="400"> | <img src="images/storage.png" width="400"> |
+| <img src="images/index.png" width="600"> | <img src="images/storage.png" width="600"> |
 
 
 
