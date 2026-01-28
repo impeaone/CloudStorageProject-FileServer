@@ -73,7 +73,12 @@ REDIS_DB=0
 METRICS_SERVER_PORT=11680
 METRICS_SERVER_IP=0.0.0.0
 ```
-
+## 🖼️ Демонстрация Web UI
+<div align="center">
+| Главная страница | Хранилище |
+|---------------|--------------|
+| <img src="images/index.png" width="400"> | <img src="images/storage.png" width="400"> |  
+</div>
 
 
 
