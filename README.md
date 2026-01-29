@@ -7,7 +7,7 @@
 
 ## 🚀 Запуск
 ```bash
-git clone <ваш-репозиторий>
+git clone https://github.com/impeaone/CloudStorage
 cd CloudStorage 
 docker-compose up -d
 ```
